@@ -4229,3 +4229,167 @@ LEFT JOIN	All left + matching right	NULL if no match on right
 RIGHT JOIN	All right + matching left	NULL if no match on left
 FULL OUTER JOIN	All rows from both tables	NULL if no match
 CROSS JOIN	Cartesian product	Multiplicative rows
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+AVAVAVAVAVAVAAVAVAVVAVAVAVAAVAVAVAVVAVAVAVAVAVAVAVAVAVAAV
+
+
+
+
+
+
+
+
+
+mondo db use kore code application banaw for crude operation todo list
+ChatGPT said:
+
+ঠিক আছে ভাই 😎 — আমি তোমাকে দেখাবো Node.js + MongoDB দিয়ে CRUD Todo List Application step by step।
+এখানে আমরা Express.js + Mongoose + MongoDB use করব।
+
+🔹 Step 1: Project Setup
+mkdir todo-app
+cd todo-app
+npm init -y
+npm install express mongoose body-parser cors
+
+🔹 Step 2: MongoDB Setup
+
+Install MongoDB locally অথবা MongoDB Atlas ব্যবহার করতে পারো।
+
+Example connection string (local):
+
+mongodb://127.0.0.1:27017/todoDB
+
+🔹 Step 3: Create Express Server
+
+server.js
+
+const express = require("express");
+const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+
+const app = express();
+app.use(cors());
+app.use(bodyParser.json());
+
+// MongoDB connection
+mongoose.connect("mongodb://127.0.0.1:27017/todoDB", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log("MongoDB connected"))
+.catch(err => console.log(err));
+
+// Todo Schema
+const todoSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  completed: { type: Boolean, default: false },
+  createdAt: { type: Date, default: Date.now }
+});
+
+const Todo = mongoose.model("Todo", todoSchema);
+
+// Routes
+
+// 1️⃣ Create Todo
+app.post("/todos", async (req, res) => {
+  try {
+    const todo = new Todo(req.body);
+    await todo.save();
+    res.status(201).json(todo);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// 2️⃣ Read all Todos
+app.get("/todos", async (req, res) => {
+  try {
+    const todos = await Todo.find();
+    res.json(todos);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 3️⃣ Read single Todo
+app.get("/todos/:id", async (req, res) => {
+  try {
+    const todo = await Todo.findById(req.params.id);
+    if (!todo) return res.status(404).json({ message: "Todo not found" });
+    res.json(todo);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 4️⃣ Update Todo
+app.put("/todos/:id", async (req, res) => {
+  try {
+    const todo = await Todo.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!todo) return res.status(404).json({ message: "Todo not found" });
+    res.json(todo);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// 5️⃣ Delete Todo
+app.delete("/todos/:id", async (req, res) => {
+  try {
+    const todo = await Todo.findByIdAndDelete(req.params.id);
+    if (!todo) return res.status(404).json({ message: "Todo not found" });
+    res.json({ message: "Todo deleted" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Start server
+app.listen(3000, () => console.log("Server running at http://localhost:3000"));
+
+🔹 Step 4: Test API
+
+Use Postman / Insomnia / browser
+
+Create Todo
+POST http://localhost:3000/todos
+Body (JSON):
+{
+  "title": "Learn Node.js"
+}
+
+Get all Todos
+GET http://localhost:3000/todos
+
+Update Todo
+PUT http://localhost:3000/todos/:id
+Body:
+{
+  "completed": true
+}
+
+Delete Todo
+DELETE http://localhost:3000/todos/:id
+
+🔹 Step 5: Notes
+
+MongoDB collection: todos
+
+Schema validation via Mongoose
+
+Can easily extend with user authentication, JWT, etc.
